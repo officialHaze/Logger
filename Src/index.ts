@@ -1,4 +1,3 @@
-import 'dotenv/config'
 import { BROWSER_LOG, DEFAULT_ENVIRONMENT, TERMINAL_LOG } from './Constants/constants'
 
 interface LoggerOptions
