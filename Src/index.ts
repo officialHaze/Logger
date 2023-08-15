@@ -3,54 +3,64 @@ import { BROWSER_LOG, DEFAULT_ENVIRONMENT, TERMINAL_LOG } from './Constants/cons
 interface LoggerOptions
 {
     environment: string,
-    isReact: boolean
+    isUsingReact: boolean
 }
 
 
-const getUserdefinedAndProjEnv = (env: string|undefined, isreact: boolean|undefined): [projenv: string|undefined, userdefinedenv: string]=>{
-    const isPlatformReact = isreact!==undefined ? isreact : Logger.defaultIsReact
-    const projenv = isPlatformReact ? process.env.REACT_APP_LOGGER_ENVIRONMENT : process.env.LOGGER_ENVIRONMENT
+// const getUserdefinedAndProjEnv = (env: string|undefined, isUsingReact: boolean|undefined): [projenv: string|undefined, userdefinedenv: string]=>{
+//     const isPlatformReact = isUsingReact!==undefined ? isUsingReact : Logger.usingReact
+//     const projenv = isPlatformReact ? process.env.REACT_APP_LOGGER_ENVIRONMENT : process.env.LOGGER_ENVIRONMENT
     
-    // const projenv_ = projenv ? projenv : Logger.defaultEnvironment
-    const userDefinedEnv = env ? env : Logger.defaultEnvironment
+//     // const projenv_ = projenv ? projenv : Logger.defaultEnvironment
+//     const userDefinedEnv = env ? env : Logger.environment
 
-    return [projenv, userDefinedEnv]
-}
+//     return [projenv, userDefinedEnv]
+// }
 
 
 class Logger
 {
-    static defaultEnvironment: string;
-    static defaultIsReact: boolean;
+    environment: string;
+    usingReact: boolean;
 
-    constructor(loggerOptions: LoggerOptions)
+    constructor()
     {
-        const {environment, isReact} = loggerOptions
-        Logger.defaultEnvironment = environment,
-        Logger.defaultIsReact = isReact
+        this.environment = DEFAULT_ENVIRONMENT, // Default environment
+        this.usingReact = false // Default value for is using react
     }
 
-    static normallog(message: string, env?: string, isreact?: boolean)
+    private getUserdefinedAndProjEnv(env: string|undefined, isUsingReact: boolean|undefined): [projenv: string|undefined, userdefinedenv: string]
     {
-        const [projenv, userdefinedEnv] = getUserdefinedAndProjEnv(env, isreact)
+        const isPlatformReact = isUsingReact!==undefined ? isUsingReact : this.usingReact
+        const projenv = isPlatformReact ? process.env.REACT_APP_LOGGER_ENVIRONMENT : process.env.LOGGER_ENVIRONMENT
+        
+        // const projenv_ = projenv ? projenv : Logger.defaultEnvironment
+        const userDefinedEnv = env ? env : this.environment
+    
+        return [projenv, userDefinedEnv]
+    }
+
+    public normallog(message: any, env?: string, isUsingReact?: boolean)
+    {
+        const [projenv, userdefinedEnv] = this.getUserdefinedAndProjEnv(env, isUsingReact)
         if(projenv === userdefinedEnv)
         {
             console.log(message)
         }
     }
 
-    static warnlog(message: string, logtype: string, env?: string, isreact?: boolean)
+    public warnlog(message: any, logtype: string, env?: string, isUsingReact?: boolean)
     {
-        const [projenv, userDefinedEnv] = getUserdefinedAndProjEnv(env, isreact)
+        const [projenv, userDefinedEnv] = this.getUserdefinedAndProjEnv(env, isUsingReact)
         if(projenv === userDefinedEnv)
         {
             logtype === BROWSER_LOG ? console.warn(message) : console.log("\x1b[33m%s\x1b[0m", message)
         }
     }
 
-    static errorlog(message: string, logtype: string, env?: string, isreact?: boolean)
+    public errorlog(message: any, logtype: string, env?: string, isUsingReact?: boolean)
     {
-        const [projenv, userDefinedEnv] = getUserdefinedAndProjEnv(env, isreact)
+        const [projenv, userDefinedEnv] = this.getUserdefinedAndProjEnv(env, isUsingReact)
         if(projenv === userDefinedEnv)
         {
             logtype === BROWSER_LOG ? console.error(message) : console.log("\x1b[31m%s\x1b[0m", message)
@@ -61,63 +71,67 @@ class Logger
 
 class BrowserLogger extends Logger
 {
-    constructor(loggerOptions: LoggerOptions)
+    constructor()
     {
-        super(loggerOptions)
+        super()
     }
 
     create(loggerOptions: LoggerOptions)
     {
-        const b_logger = new BrowserLogger(loggerOptions)
+        const b_logger = new BrowserLogger()
+        b_logger.environment = loggerOptions.environment
+        b_logger.usingReact = loggerOptions.isUsingReact
         return b_logger
     }
 
     log(message: string, env?: string, isreact?: boolean)
     {
-        Logger.normallog(message, env, isreact)
+        this.normallog(message, env, isreact)
     }
 
     warn(message: string, env?: string, isreact?: boolean)
     {
-      Logger.warnlog(message, BROWSER_LOG, env, isreact)  
+      this.warnlog(message, BROWSER_LOG, env, isreact)  
     }
 
     error(message: string, env?: string, isreact?: boolean)
     {
-        Logger.errorlog(message, BROWSER_LOG, env, isreact)
+        this.errorlog(message, BROWSER_LOG, env, isreact)
     }
 }
 
 
 class TerminalLogger extends Logger
 {
-    constructor(loggerOptions: LoggerOptions)
+    constructor()
     {
-        super(loggerOptions)
+        super()
     }
 
     create(loggerOptions: LoggerOptions)
     {
-        const t_logger = new TerminalLogger(loggerOptions)
+        const t_logger = new TerminalLogger()
+        t_logger.environment = loggerOptions.environment
+        t_logger.usingReact = loggerOptions.isUsingReact
         return t_logger
     }
 
-    log(message: string, env?: string, isreact?: boolean)
+    log(message: any, env?: string, isUsingReact?: boolean)
     {
-        Logger.normallog(message, env, isreact)
+        this.normallog(message, env, isUsingReact)
     }
 
-    warn(message: string, env?: string, isreact?: boolean)
+    warn(message: any, env?: string, isUsingReact?: boolean)
     {
-      Logger.warnlog(message, TERMINAL_LOG, env, isreact)  
+      this.warnlog(message, TERMINAL_LOG, env, isUsingReact)  
     }
 
-    error(message: string, env?: string, isreact?: boolean)
+    error(message: any, env?: string, isUsingReact?: boolean)
     {
-        Logger.errorlog(message, TERMINAL_LOG, env, isreact)
+        this.errorlog(message, TERMINAL_LOG, env, isUsingReact)
     }
 }
 
-export const browserLogger = new BrowserLogger({environment: DEFAULT_ENVIRONMENT, isReact: false})
-export const terminalLogger = new TerminalLogger({environment: DEFAULT_ENVIRONMENT, isReact: false})
+export const browserLogger = new BrowserLogger()
+export const terminalLogger = new TerminalLogger()
 
