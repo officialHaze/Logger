@@ -18,5 +18,10 @@
     "url": "https://github.com/officialHaze/Logger/issues"
   },
   "homepage": "https://github.com/officialHaze/Logger#readme",
-  "files": ["Dist/**/*"]
+  "files": [
+    "Dist/**/*"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.5.0"
+  }
 }
