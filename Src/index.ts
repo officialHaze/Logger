@@ -7,25 +7,25 @@ interface LoggerOptions
 }
 
 
-export class Logger
+class Logger
 {
-    static environment: string = "development"
-    static isReact: boolean = false
+    environment: string = "development"
+    isReact: boolean = false
 
-    constructor(loggerOptions: LoggerOptions)
+    create(loggerOptions: LoggerOptions)
     {
         const {environment, isReact} = loggerOptions
-        Logger.environment = environment,
-        Logger.isReact = isReact
+        this.environment = environment,
+        this.isReact = isReact
     }
 
-    static log(message: string, env: string | null | undefined, isreact: boolean | null | undefined)
+    log(message: string, env: string | null | undefined, isreact: boolean | null | undefined)
     {
-        const isReactPlatform = isreact ? isreact : Logger.isReact
+        const isReactPlatform = isreact ? isreact : this.isReact
         const projenv = isReactPlatform ? process.env.REACT_APP_LOGGER_ENVIRONMENT : process.env.LOGGER_ENVIRONMENT
-        const userDefinedEnv = env ? env : Logger.environment
+        const userDefinedEnv = env ? env : this.environment
 
-        const projenv_ = projenv ? projenv : Logger.environment
+        const projenv_ = projenv ? projenv : this.environment
 
         if(projenv_ === userDefinedEnv)
         {
@@ -33,4 +33,8 @@ export class Logger
         }
     }
 }
+
+const logger = new Logger()
+
+export default logger
 
