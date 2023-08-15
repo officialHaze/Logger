@@ -1,2 +1,2 @@
 # Logger
-Keep logs as per the project environment
+Log as per the project environment
