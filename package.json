@@ -1,0 +1,22 @@
+{
+  "name": "@logbyenv/logger",
+  "version": "1.0.0",
+  "description": "Keep logs as per the project environment",
+  "main": "Dist/index.js",
+  "types": "Dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/officialHaze/Logger.git"
+  },
+  "author": "Moinak",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/officialHaze/Logger/issues"
+  },
+  "homepage": "https://github.com/officialHaze/Logger#readme",
+  "files": ["Dist/**/*"]
+}
