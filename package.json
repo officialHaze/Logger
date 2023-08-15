@@ -1,5 +1,5 @@
 {
-  "name": "@logbyenv/logger",
+  "name": "@banglarthek/logger",
   "version": "1.0.0",
   "description": "Keep logs as per the project environment",
   "main": "Dist/index.js",
