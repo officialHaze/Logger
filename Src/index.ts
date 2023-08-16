@@ -1,38 +1,53 @@
-import { BROWSER_LOG, DEFAULT_ENVIRONMENT, TERMINAL_LOG } from './Constants/constants'
+import { BROWSER_LOG, TERMINAL_LOG } from './Constants/constants'
 
 interface LoggerOptions
 {
-    environment: string,
+    loggerEnvironments: string[],
     isUsingReact: boolean
 }
 
 
 class Logger
 {
-    environment: string;
+    environments: string[];
     usingReact: boolean;
 
     constructor()
     {
-        this.environment = DEFAULT_ENVIRONMENT, // Default environment
+        this.environments = [], // Default environments are empty
         this.usingReact = false // Default value for is using react
     }
 
-    private getUserdefinedAndProjEnv(env: string|undefined, isUsingReact: boolean|undefined): [projenv: string|undefined, userdefinedenv: string]
+    private getProjEnv(isUsingReact: boolean|undefined): string|undefined
     {
         const isPlatformReact = isUsingReact!==undefined ? isUsingReact : this.usingReact
         const projenv = isPlatformReact ? process.env.REACT_APP_LOGGER_ENVIRONMENT : process.env.LOGGER_ENVIRONMENT
         
         // const projenv_ = projenv ? projenv : Logger.defaultEnvironment
-        const userDefinedEnv = env ? env : this.environment
+        // const userDefinedEnv = env ? env : this.environments
     
-        return [projenv, userDefinedEnv]
+        return projenv
     }
 
     public normallog(message: any, env?: string, isUsingReact?: boolean)
     {
-        const [projenv, userdefinedEnv] = this.getUserdefinedAndProjEnv(env, isUsingReact)
-        if(projenv === userdefinedEnv)
+        const projenv = this.getProjEnv(isUsingReact)
+        if(env && env === projenv)
+        {
+            console.log(message)
+        }
+        if(this.environments.length !== 0)
+        {
+            for(let i=0; i<this.environments.length; i++)
+            {
+                if(this.environments[i] === projenv && this.environments[i] !== env)
+                {
+                    console.log(message)
+                    i += this.environments.length //  Break the loop
+                }
+            }
+        }
+        else if(!env && this.environments.length === 0)
         {
             console.log(message)
         }
@@ -40,8 +55,23 @@ class Logger
 
     public warnlog(message: any, logtype: string, env?: string, isUsingReact?: boolean)
     {
-        const [projenv, userDefinedEnv] = this.getUserdefinedAndProjEnv(env, isUsingReact)
-        if(projenv === userDefinedEnv)
+        const projenv = this.getProjEnv(isUsingReact)
+        if(env && env === projenv)
+        {
+            logtype === BROWSER_LOG ? console.warn(message) : console.log("\x1b[33m%s\x1b[0m", message)
+        }
+        if(this.environments.length !== 0)
+        {
+            for(let i=0; i<this.environments.length; i++)
+            {
+                if(this.environments[i] === projenv)
+                {
+                    logtype === BROWSER_LOG ? console.warn(message) : console.log("\x1b[33m%s\x1b[0m", message)
+                    i += this.environments.length //  Break the loop
+                }
+            }
+        }
+        else if(!env && this.environments.length === 0)
         {
             logtype === BROWSER_LOG ? console.warn(message) : console.log("\x1b[33m%s\x1b[0m", message)
         }
@@ -49,10 +79,25 @@ class Logger
 
     public errorlog(message: any, logtype: string, env?: string, isUsingReact?: boolean)
     {
-        const [projenv, userDefinedEnv] = this.getUserdefinedAndProjEnv(env, isUsingReact)
-        if(projenv === userDefinedEnv)
+        const projenv = this.getProjEnv(isUsingReact)
+        if(env && env === projenv)
         {
             logtype === BROWSER_LOG ? console.error(message) : console.log("\x1b[31m%s\x1b[0m", message)
+        }
+        if(this.environments.length !== 0)
+        {
+            for(let i=0; i<this.environments.length; i++)
+            {
+                if(this.environments[i] === projenv)
+                {
+                    logtype === BROWSER_LOG ? console.error(message) : console.log("\x1b[31m%s\x1b[0m", message)
+                    i += this.environments.length //  Break the loop
+                }
+            }
+        }
+        else if(!env && this.environments.length === 0)
+        {
+            console.log(message)
         }
     }
 }
@@ -68,24 +113,24 @@ class BrowserLogger extends Logger
     create(loggerOptions: LoggerOptions)
     {
         const b_logger = new BrowserLogger()
-        b_logger.environment = loggerOptions.environment
+        b_logger.environments = loggerOptions.loggerEnvironments
         b_logger.usingReact = loggerOptions.isUsingReact
         return b_logger
     }
 
-    log(message: any, env?: string, isreact?: boolean)
+    log(message: any, env?: string, isUsingReact?: boolean)
     {
-        this.normallog(message, env, isreact)
+        this.normallog(message, env, isUsingReact)
     }
 
-    warn(message: any, env?: string, isreact?: boolean)
+    warn(message: any, env?: string, isUsingReact?: boolean)
     {
-      this.warnlog(message, BROWSER_LOG, env, isreact)  
+      this.warnlog(message, BROWSER_LOG, env, isUsingReact)  
     }
 
-    error(message: any, env?: string, isreact?: boolean)
+    error(message: any, env?: string, isUsingReact?: boolean)
     {
-        this.errorlog(message, BROWSER_LOG, env, isreact)
+        this.errorlog(message, BROWSER_LOG, env, isUsingReact)
     }
 }
 
@@ -100,7 +145,7 @@ class TerminalLogger extends Logger
     create(loggerOptions: LoggerOptions)
     {
         const t_logger = new TerminalLogger()
-        t_logger.environment = loggerOptions.environment
+        t_logger.environments = loggerOptions.loggerEnvironments
         t_logger.usingReact = loggerOptions.isUsingReact
         return t_logger
     }
