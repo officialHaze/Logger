@@ -7,17 +7,6 @@ interface LoggerOptions
 }
 
 
-// const getUserdefinedAndProjEnv = (env: string|undefined, isUsingReact: boolean|undefined): [projenv: string|undefined, userdefinedenv: string]=>{
-//     const isPlatformReact = isUsingReact!==undefined ? isUsingReact : Logger.usingReact
-//     const projenv = isPlatformReact ? process.env.REACT_APP_LOGGER_ENVIRONMENT : process.env.LOGGER_ENVIRONMENT
-    
-//     // const projenv_ = projenv ? projenv : Logger.defaultEnvironment
-//     const userDefinedEnv = env ? env : Logger.environment
-
-//     return [projenv, userDefinedEnv]
-// }
-
-
 class Logger
 {
     environment: string;
@@ -84,17 +73,17 @@ class BrowserLogger extends Logger
         return b_logger
     }
 
-    log(message: string, env?: string, isreact?: boolean)
+    log(message: any, env?: string, isreact?: boolean)
     {
         this.normallog(message, env, isreact)
     }
 
-    warn(message: string, env?: string, isreact?: boolean)
+    warn(message: any, env?: string, isreact?: boolean)
     {
       this.warnlog(message, BROWSER_LOG, env, isreact)  
     }
 
-    error(message: string, env?: string, isreact?: boolean)
+    error(message: any, env?: string, isreact?: boolean)
     {
         this.errorlog(message, BROWSER_LOG, env, isreact)
     }
