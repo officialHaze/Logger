@@ -1,4 +1,4 @@
-import { BROWSER_LOG, DEFAULT_ENVIRONMENT, TERMINAL_LOG } from './Constants/constants'
+import { BROWSER_LOG, TERMINAL_LOG } from './Constants/constants'
 
 interface LoggerOptions
 {
