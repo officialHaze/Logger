@@ -3,99 +3,106 @@ import { BROWSER_LOG, TERMINAL_LOG } from './Constants/constants'
 interface LoggerOptions
 {
     loggerEnvironments: string[],
-    isUsingReact: boolean
+    environmentName: string,
 }
 
 
 class Logger
 {
-    environments: string[];
-    usingReact: boolean;
+    private environments: string[];
+    private envName:  string;
 
     constructor()
     {
         this.environments = [], // Default environments are empty
-        this.usingReact = false // Default value for is using react
+        this.envName = "LOGGER_ENVIRONMENT" // Default env name
     }
 
-    private getProjEnv(isUsingReact: boolean|undefined): string|undefined
+    private static getProjEnv(obj: TerminalLogger|BrowserLogger): string|undefined
     {
-        const isPlatformReact = isUsingReact!==undefined ? isUsingReact : this.usingReact
-        const projenv = isPlatformReact ? process.env.REACT_APP_LOGGER_ENVIRONMENT : process.env.LOGGER_ENVIRONMENT
-        
-        // const projenv_ = projenv ? projenv : Logger.defaultEnvironment
-        // const userDefinedEnv = env ? env : this.environments
+        const projenv = process.env[obj.envName]
+        console.log(`Project environment ---> ${projenv}`)
     
         return projenv
     }
 
-    public normallog(message: any, env?: string, isUsingReact?: boolean)
+    static setEnvironments(obj: TerminalLogger|BrowserLogger, envs: string[])
     {
-        const projenv = this.getProjEnv(isUsingReact)
+        obj.environments = envs
+    }
+
+    static setEnvName(obj: TerminalLogger|BrowserLogger, name: string)
+    {
+        obj.envName = name
+    }
+
+    static setLog(obj: TerminalLogger|BrowserLogger, message: any, env?: string): void
+    {
+        const projenv = Logger.getProjEnv(obj)
         if(env && env === projenv)
         {
             console.log(message)
         }
-        if(this.environments.length !== 0)
+        if(obj.environments.length !== 0)
         {
-            for(let i=0; i<this.environments.length; i++)
+            for(let i=0; i<obj.environments.length; i++)
             {
-                if(this.environments[i] === projenv && this.environments[i] !== env)
+                if(obj.environments[i] === projenv && obj.environments[i] !== env)
                 {
                     console.log(message)
-                    i += this.environments.length //  Break the loop
+                    i += obj.environments.length //  Break the loop
                 }
             }
         }
-        else if(!env && this.environments.length === 0)
+        else if(!env && !projenv && obj.environments.length === 0)
         {
             console.log(message)
         }
     }
 
-    public warnlog(message: any, logtype: string, env?: string, isUsingReact?: boolean)
+    static setWarnlog(obj: TerminalLogger|BrowserLogger, message: any, logtype: string, env?: string)
     {
-        const projenv = this.getProjEnv(isUsingReact)
+        const projenv = this.getProjEnv(obj)
         if(env && env === projenv)
         {
             logtype === BROWSER_LOG ? console.warn(message) : console.log("\x1b[33m%s\x1b[0m", message)
         }
-        if(this.environments.length !== 0)
+        if(obj.environments.length !== 0)
         {
-            for(let i=0; i<this.environments.length; i++)
+            for(let i=0; i<obj.environments.length; i++)
             {
-                if(this.environments[i] === projenv)
+                if(obj.environments[i] === projenv)
                 {
                     logtype === BROWSER_LOG ? console.warn(message) : console.log("\x1b[33m%s\x1b[0m", message)
-                    i += this.environments.length //  Break the loop
+                    i += obj.environments.length //  Break the loop
                 }
             }
         }
-        else if(!env && this.environments.length === 0)
+        else if(!env && !projenv && obj.environments.length === 0)
         {
             logtype === BROWSER_LOG ? console.warn(message) : console.log("\x1b[33m%s\x1b[0m", message)
         }
     }
 
-    public errorlog(message: any, logtype: string, env?: string, isUsingReact?: boolean)
+    static setErrorlog(obj: TerminalLogger|BrowserLogger, message: any, logtype: string, env?: string)
     {
-        const projenv = this.getProjEnv(isUsingReact)
+        const projenv = this.getProjEnv(obj)
         if(env && env === projenv)
         {
             logtype === BROWSER_LOG ? console.error(message) : console.log("\x1b[31m%s\x1b[0m", message)
         }
-        if(this.environments.length !== 0)
+        if(obj.environments.length !== 0)
         {
-            for(let i=0; i<this.environments.length; i++)
+            for(let i=0; i<obj.environments.length; i++)
             {
-                if(this.environments[i] === projenv)
+                if(obj.environments[i] === projenv)
                 {
                     logtype === BROWSER_LOG ? console.error(message) : console.log("\x1b[31m%s\x1b[0m", message)
-                    i += this.environments.length //  Break the loop
+                    i += obj.environments.length //  Break the loop
                 }
             }
         }
-        else if(!env && this.environments.length === 0)
+        else if(!env && !projenv && obj.environments.length === 0)
         {
             console.log(message)
         }
@@ -113,24 +120,24 @@ class BrowserLogger extends Logger
     create(loggerOptions: LoggerOptions)
     {
         const b_logger = new BrowserLogger()
-        b_logger.environments = loggerOptions.loggerEnvironments
-        b_logger.usingReact = loggerOptions.isUsingReact
+        Logger.setEnvironments(b_logger, loggerOptions.loggerEnvironments)
+        Logger.setEnvName(b_logger, loggerOptions.environmentName)
         return b_logger
     }
 
-    log(message: any, env?: string, isUsingReact?: boolean)
+    log(message: any, env?: string)
     {
-        this.normallog(message, env, isUsingReact)
+        Logger.setLog(this, message, env)
     }
 
-    warn(message: any, env?: string, isUsingReact?: boolean)
+    warn(message: any, env?: string)
     {
-      this.warnlog(message, BROWSER_LOG, env, isUsingReact)  
+      Logger.setWarnlog(this, message, BROWSER_LOG, env)  
     }
 
-    error(message: any, env?: string, isUsingReact?: boolean)
+    error(message: any, env?: string)
     {
-        this.errorlog(message, BROWSER_LOG, env, isUsingReact)
+        Logger.setErrorlog(this, message, BROWSER_LOG, env)
     }
 }
 
@@ -145,24 +152,24 @@ class TerminalLogger extends Logger
     create(loggerOptions: LoggerOptions)
     {
         const t_logger = new TerminalLogger()
-        t_logger.environments = loggerOptions.loggerEnvironments
-        t_logger.usingReact = loggerOptions.isUsingReact
+        Logger.setEnvironments(t_logger, loggerOptions.loggerEnvironments)
+        Logger.setEnvName(t_logger, loggerOptions.environmentName)
         return t_logger
     }
 
-    log(message: any, env?: string, isUsingReact?: boolean)
+    log(message: any, env?: string)
     {
-        this.normallog(message, env, isUsingReact)
+        Logger.setLog(this, message, env)
     }
 
-    warn(message: any, env?: string, isUsingReact?: boolean)
+    warn(message: any, env?: string)
     {
-      this.warnlog(message, TERMINAL_LOG, env, isUsingReact)  
+      Logger.setWarnlog(this, message, TERMINAL_LOG, env)  
     }
 
-    error(message: any, env?: string, isUsingReact?: boolean)
+    error(message: any, env?: string)
     {
-        this.errorlog(message, TERMINAL_LOG, env, isUsingReact)
+        Logger.setErrorlog(this, message, TERMINAL_LOG, env)
     }
 }
 
