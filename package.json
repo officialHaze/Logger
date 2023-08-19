@@ -1,6 +1,6 @@
 {
   "name": "@banglarthek/logger",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Log by project environment",
   "main": "Dist/index.js",
   "types": "Dist/index.d.ts",
@@ -14,6 +14,7 @@
   },
   "author": "Moinak",
   "license": "MIT",
+  "keywords": ["logger", "log by specific environment", "frontend logger", "backend logger"],
   "bugs": {
     "url": "https://github.com/officialHaze/Logger/issues"
   },
