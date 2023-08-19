@@ -21,8 +21,6 @@ class Logger
     private static getProjEnv(obj: TerminalLogger|BrowserLogger): string|undefined
     {
         const projenv = process.env[obj.envName]
-        console.log(`Project environment ---> ${projenv}`)
-    
         return projenv
     }
 
