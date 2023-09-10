@@ -10,7 +10,6 @@ class Logger {
 
   constructor() {
     this.environments = []; // Default environments are empty
-    //   (this.envName = "LOGGER_ENVIRONMENT"); // Default env name
   }
 
   private static getProjEnv(obj: TerminalLogger | BrowserLogger): string | undefined {
@@ -69,12 +68,7 @@ class Logger {
     }
   }
 
-  static setWarnlog(
-    obj: TerminalLogger | BrowserLogger,
-    message: any,
-    logtype: string,
-    env?: string
-  ) {
+  static setWarnlog(obj: TerminalLogger | BrowserLogger, message: any, env?: string) {
     const projenv = this.getProjEnv(obj);
     const err = new Error();
     const callerInfo = err.stack?.split("\n")[3].trim().split(" ")[2];
@@ -153,12 +147,7 @@ class Logger {
     }
   }
 
-  static setErrorlog(
-    obj: TerminalLogger | BrowserLogger,
-    message: any,
-    logtype: string,
-    env?: string
-  ) {
+  static setErrorlog(obj: TerminalLogger | BrowserLogger, message: any, env?: string) {
     const projenv = this.getProjEnv(obj);
     const err = new Error();
     const callerInfo = err.stack?.split("\n")[3].trim().split(" ")[2];
@@ -226,11 +215,11 @@ class BrowserLogger extends Logger {
   }
 
   warn(message: any, env?: string) {
-    Logger.setWarnlog(this, message, BROWSER_LOG, env);
+    Logger.setWarnlog(this, message, env);
   }
 
   error(message: any, env?: string) {
-    Logger.setErrorlog(this, message, BROWSER_LOG, env);
+    Logger.setErrorlog(this, message, env);
   }
 }
 
@@ -242,7 +231,6 @@ class TerminalLogger extends Logger {
   create(loggerOptions: LoggerOptions) {
     const t_logger = new TerminalLogger();
     Logger.setEnvironments(t_logger, loggerOptions.loggerEnvironments);
-    // Logger.setEnvName(t_logger, loggerOptions.environmentName);
     return t_logger;
   }
 
@@ -251,11 +239,11 @@ class TerminalLogger extends Logger {
   }
 
   warn(message: any, env?: string) {
-    Logger.setWarnlog(this, message, TERMINAL_LOG, env);
+    Logger.setWarnlog(this, message, env);
   }
 
   error(message: any, env?: string) {
-    Logger.setErrorlog(this, message, TERMINAL_LOG, env);
+    Logger.setErrorlog(this, message, env);
   }
 }
 
