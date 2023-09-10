@@ -1,6 +1,6 @@
 {
   "name": "@banglarthek/logger",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Log by project environment",
   "main": "Dist/index.js",
   "types": "Dist/index.d.ts",

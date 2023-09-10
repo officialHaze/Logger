@@ -5,14 +5,14 @@ interface LoggerOptions {
 }
 
 class Logger {
-  private environments: string[];
+  private environments: string[] = ["development"]; // Default
   private envName: string | undefined = process.env.NODE_ENV;
 
   constructor() {
     this.environments = []; // Default environments are empty
   }
 
-  private static getProjEnv(obj: TerminalLogger | BrowserLogger): string | undefined {
+  static getProjEnv(obj: TerminalLogger | BrowserLogger): string | undefined {
     const projenv = obj.envName;
     return projenv;
   }
@@ -21,14 +21,21 @@ class Logger {
     obj.environments = envs;
   }
 
-  static setEnvName(obj: TerminalLogger | BrowserLogger, name: string) {
-    obj.envName = name;
+  static getEnvironments(obj: BrowserLogger) {
+    return obj.environments;
   }
+
+  // static setEnvName(obj: TerminalLogger | BrowserLogger, name: string) {
+  //   obj.envName = name;
+  // }
 
   static setLog(obj: TerminalLogger | BrowserLogger, message: any, env?: string): void {
     const projenv = Logger.getProjEnv(obj);
     const err = new Error();
-    const callerInfo = err.stack?.split("\n")[3].trim().split(" ")[2];
+    console.log(err.stack);
+    // const callerInfo = err.stack?.split("\n")[3].trim().split(" ")[2];
+    const callerInfo = err.stack?.split("\n")[3].trim().split(" ")[1];
+    console.log(err.stack?.split("\n")[3].trim().split(" ")[1]);
     if (env && env === projenv) {
       console.log(
         `[${new Date().toLocaleString("en-US", {
@@ -210,16 +217,103 @@ class BrowserLogger extends Logger {
     return b_logger;
   }
 
-  log(message: any, env?: string) {
-    Logger.setLog(this, message, env);
+  log(message: any) {
+    const envs = Logger.getEnvironments(this);
+    const projenv = Logger.getProjEnv(this);
+    if (envs.length !== 0) {
+      for (let i = 0; i < envs.length; i++) {
+        if (envs[i] === projenv) {
+          this.log = console.log.bind(
+            console,
+            `[${new Date().toLocaleString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })}] `
+          );
+          i += envs.length; //  Break the loop
+        }
+      }
+    } else if (!projenv && envs.length === 0) {
+      this.log = console.log.bind(
+        console,
+        `[${new Date().toLocaleString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        })}] `
+      );
+    }
   }
 
-  warn(message: any, env?: string) {
-    Logger.setWarnlog(this, message, env);
+  warn(message: any) {
+    const envs = Logger.getEnvironments(this);
+    const projenv = Logger.getProjEnv(this);
+    if (envs.length !== 0) {
+      for (let i = 0; i < envs.length; i++) {
+        if (envs[i] === projenv) {
+          this.warn = console.warn.bind(
+            console,
+            `[${new Date().toLocaleString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })}] `
+          );
+          i += envs.length; //  Break the loop
+        }
+      }
+    } else if (!projenv && envs.length === 0) {
+      this.warn = console.warn.bind(
+        console,
+        `[${new Date().toLocaleString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        })}] `
+      );
+    }
   }
 
-  error(message: any, env?: string) {
-    Logger.setErrorlog(this, message, env);
+  error(message: any) {
+    const envs = Logger.getEnvironments(this);
+    const projenv = Logger.getProjEnv(this);
+    if (envs.length !== 0) {
+      for (let i = 0; i < envs.length; i++) {
+        if (envs[i] === projenv) {
+          this.error = console.error.bind(
+            console,
+            `[${new Date().toLocaleString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })}] `
+          );
+          i += envs.length; //  Break the loop
+        }
+      }
+    } else if (!projenv && envs.length === 0) {
+      this.error = console.error.bind(
+        console,
+        `[${new Date().toLocaleString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        })}] `
+      );
+    }
   }
 }
 
