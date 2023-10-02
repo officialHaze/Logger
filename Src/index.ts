@@ -45,10 +45,21 @@ class Logger {
     return obj.environments;
   }
 
+  private static linenumber(position: number) {
+    const err = new Error();
+    return err.stack?.split("\n")[4].trim().split(" ")[position];
+  }
+
+  private static lineExists(val: string | undefined) {
+    if (!val) return false;
+    return true;
+  }
+
   static setLog(obj: TerminalLogger | BrowserLogger, message: any, env?: string): void {
     const projenv = Logger.getProjEnv(obj);
-    const err = new Error();
-    const callerInfo = err.stack?.split("\n")[3].trim().split(" ")[2];
+    const callerInfo = this.lineExists(this.linenumber(2))
+      ? this.linenumber(2)
+      : this.linenumber(1);
     // const callerInfo = err.stack?.split("\n")[3].trim().split(" ")[1];
 
     // Assign the log object
@@ -78,8 +89,9 @@ class Logger {
 
   static setWarnlog(obj: TerminalLogger | BrowserLogger, message: any, env?: string) {
     const projenv = this.getProjEnv(obj);
-    const err = new Error();
-    const callerInfo = err.stack?.split("\n")[3].trim().split(" ")[2];
+    const callerInfo = this.lineExists(this.linenumber(2))
+      ? this.linenumber(2)
+      : this.linenumber(1);
 
     const logTime = `${new Date().toLocaleString("en-US", {
       hour: "2-digit",
@@ -110,8 +122,9 @@ class Logger {
 
   static setErrorlog(obj: TerminalLogger | BrowserLogger, message: any, env?: string) {
     const projenv = this.getProjEnv(obj);
-    const err = new Error();
-    const callerInfo = err.stack?.split("\n")[3].trim().split(" ")[2];
+    const callerInfo = this.lineExists(this.linenumber(2))
+      ? this.linenumber(2)
+      : this.linenumber(1);
 
     const logTime = `${new Date().toLocaleString("en-US", {
       hour: "2-digit",
