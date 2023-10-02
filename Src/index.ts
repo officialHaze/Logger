@@ -4,6 +4,26 @@ interface LoggerOptions {
   loggerEnvironments: string[];
 }
 
+class LogObject {
+  logTime = "";
+  message = "";
+  path = "";
+
+  constructor(logTime: string, message: any, path?: string) {
+    this.logTime = logTime;
+    this.message = message;
+    this.path = path ? path : "";
+  }
+
+  getObj() {
+    return {
+      time: this.logTime,
+      message: this.message,
+      path: this.path,
+    };
+  }
+}
+
 class Logger {
   private environments: string[] = ["development"]; // Default
   private envName: string | undefined = process.env.NODE_ENV;
@@ -25,53 +45,34 @@ class Logger {
     return obj.environments;
   }
 
-  // static setEnvName(obj: TerminalLogger | BrowserLogger, name: string) {
-  //   obj.envName = name;
-  // }
-
   static setLog(obj: TerminalLogger | BrowserLogger, message: any, env?: string): void {
     const projenv = Logger.getProjEnv(obj);
     const err = new Error();
-    console.log(err.stack);
-    // const callerInfo = err.stack?.split("\n")[3].trim().split(" ")[2];
-    const callerInfo = err.stack?.split("\n")[3].trim().split(" ")[1];
-    console.log(err.stack?.split("\n")[3].trim().split(" ")[1]);
+    const callerInfo = err.stack?.split("\n")[3].trim().split(" ")[2];
+    // const callerInfo = err.stack?.split("\n")[3].trim().split(" ")[1];
+
+    // Assign the log object
+    const logTime = `${new Date().toLocaleString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    })}`;
+    const logObj = new LogObject(logTime, message, callerInfo?.replace("(", "").replace(")", ""));
+
     if (env && env === projenv) {
-      console.log(
-        `[${new Date().toLocaleString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        })}]  ${message}  ${callerInfo}`
-      );
+      console.log(logObj.getObj());
     }
     if (obj.environments.length !== 0) {
       for (let i = 0; i < obj.environments.length; i++) {
         if (obj.environments[i] === projenv && obj.environments[i] !== env) {
-          console.log(
-            `[${new Date().toLocaleString("en-US", {
-              hour: "2-digit",
-              minute: "2-digit",
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            })}]  ${message}  ${callerInfo}`
-          );
+          console.log(logObj.getObj());
           i += obj.environments.length; //  Break the loop
         }
       }
     } else if (!env && !projenv && obj.environments.length === 0) {
-      console.log(
-        `[${new Date().toLocaleString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        })}]  ${message}  ${callerInfo}`
-      );
+      console.log(logObj.getObj());
     }
   }
 
@@ -79,78 +80,31 @@ class Logger {
     const projenv = this.getProjEnv(obj);
     const err = new Error();
     const callerInfo = err.stack?.split("\n")[3].trim().split(" ")[2];
+
+    const logTime = `${new Date().toLocaleString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    })}`;
+    const logObj = new LogObject(logTime, message, callerInfo?.replace("(", "").replace(")", ""));
+
     if (env && env === projenv) {
-      //   logtype === BROWSER_LOG
-      //     ? console.log(
-      //         `[${new Date().toLocaleString("en-US", {
-      //           hour: "2-digit",
-      //           minute: "2-digit",
-      //           day: "2-digit",
-      //           month: "2-digit",
-      //           year: "numeric",
-      //         })}]  ${message}  ${callerInfo}`
-      //       )
-      //     :
-      console.log(
-        "\x1b[33m%s\x1b[0m",
-        `(Warning) [${new Date().toLocaleString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        })}]  ${message}  ${callerInfo}`
-      );
+      console.log("\x1b[33m%s\x1b[0m", `Warning: `);
+      console.log(logObj.getObj());
     }
     if (obj.environments.length !== 0) {
       for (let i = 0; i < obj.environments.length; i++) {
         if (obj.environments[i] === projenv) {
-          //   logtype === BROWSER_LOG
-          //     ? console.log(
-          //         `[${new Date().toLocaleString("en-US", {
-          //           hour: "2-digit",
-          //           minute: "2-digit",
-          //           day: "2-digit",
-          //           month: "2-digit",
-          //           year: "numeric",
-          //         })}]  ${message}  ${callerInfo}`
-          //       )
-          //     :
-          console.log(
-            "\x1b[33m%s\x1b[0m",
-            `(Warning) [${new Date().toLocaleString("en-US", {
-              hour: "2-digit",
-              minute: "2-digit",
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            })}]  ${message}  ${callerInfo}`
-          );
+          console.log("\x1b[33m%s\x1b[0m", `Warning: `);
+          console.log(logObj.getObj());
           i += obj.environments.length; //  Break the loop
         }
       }
     } else if (!env && !projenv && obj.environments.length === 0) {
-      //   logtype === BROWSER_LOG
-      //     ? console.log(
-      //         `[${new Date().toLocaleString("en-US", {
-      //           hour: "2-digit",
-      //           minute: "2-digit",
-      //           day: "2-digit",
-      //           month: "2-digit",
-      //           year: "numeric",
-      //         })}]  ${message}  ${callerInfo}`
-      //       )
-      //     :
-      console.log(
-        "\x1b[33m%s\x1b[0m",
-        `(Warning) [${new Date().toLocaleString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        })}]  ${message}  ${callerInfo}`
-      );
+      console.log("\x1b[33m%s\x1b[0m", `Warning: `);
+      console.log(logObj.getObj());
     }
   }
 
@@ -158,49 +112,30 @@ class Logger {
     const projenv = this.getProjEnv(obj);
     const err = new Error();
     const callerInfo = err.stack?.split("\n")[3].trim().split(" ")[2];
+
+    const logTime = `${new Date().toLocaleString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    })}`;
+    const logObj = new LogObject(logTime, message, callerInfo?.replace("(", "").replace(")", ""));
     if (env && env === projenv) {
-      //   logtype === BROWSER_LOG ? console.error(message) :
-      console.log(
-        "\x1b[31m%s\x1b[0m",
-        `(Error) [${new Date().toLocaleString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        })}]  ${message}  ${callerInfo}`
-      );
+      console.log("\x1b[31m%s\x1b[0m", `Error: `);
+      console.log(logObj.getObj());
     }
     if (obj.environments.length !== 0) {
       for (let i = 0; i < obj.environments.length; i++) {
         if (obj.environments[i] === projenv) {
-          //   logtype === BROWSER_LOG
-          //     ? console.error(message)
-          //     :
-          console.log(
-            "\x1b[31m%s\x1b[0m",
-            `(Error) [${new Date().toLocaleString("en-US", {
-              hour: "2-digit",
-              minute: "2-digit",
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            })}]  ${message}  ${callerInfo}`
-          );
+          console.log("\x1b[31m%s\x1b[0m", `Error: `);
+          console.log(logObj.getObj());
           i += obj.environments.length; //  Break the loop
         }
       }
     } else if (!env && !projenv && obj.environments.length === 0) {
-      console.log(
-        "\x1b[31m%s\x1b[0m",
-        `(Error) [${new Date().toLocaleString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        })}]  ${message}  ${callerInfo}`
-      );
+      console.log("\x1b[31m%s\x1b[0m", `Error: `);
+      console.log(logObj.getObj());
     }
   }
 }
@@ -213,7 +148,6 @@ class BrowserLogger extends Logger {
   create(loggerOptions: LoggerOptions) {
     const b_logger = new BrowserLogger();
     Logger.setEnvironments(b_logger, loggerOptions.loggerEnvironments);
-    // Logger.setEnvName(b_logger, loggerOptions.environmentName);
     return b_logger;
   }
 
